@@ -33,8 +33,8 @@ int main(int argc, char** argv) {
     vector<suseconds_t> Zi(probabilities.size(), 0);
     vector<suseconds_t> Ti_time(probabilities.size(), 0);
 
-    struct timeval start, end, last_package, now;
-    last_package.tv_usec = 0;
+    struct timespec start, end, last_package, now;
+    last_package.tv_nsec = 0;
 
     int pkgs_in_buffer = 0;
     int pkgs_accepted = 0;
@@ -47,31 +47,31 @@ int main(int argc, char** argv) {
 
     default_random_engine generator;
 
-    gettimeofday(&start, nullptr);
-    gettimeofday(&end, nullptr);
-    while( (end.tv_usec - start.tv_usec) < ( T * 1000 ) ) {
-        gettimeofday(&now, nullptr);
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    while( (end.tv_nsec - start.tv_nsec) < ( T * 1000 ) ) {
+        clock_gettime(CLOCK_MONOTONIC, &now);
 
         // 1/Mu time has passed since service started
-        if ( !packages.empty() && ( (now.tv_usec - service_start) >= ( (1/mu) * 1000 ) ) ) {
+        if ( !packages.empty() && ( (now.tv_nsec - service_start) >= ( (1/mu) * 1000 ) ) ) {
             pkgs_in_buffer = packages.size();
-            Ti_time[pkgs_in_buffer-1] = now.tv_usec;
-            Ti[pkgs_in_buffer] += now.tv_usec - Ti_time[pkgs_in_buffer];
+            Ti_time[pkgs_in_buffer-1] = now.tv_nsec;
+            Ti[pkgs_in_buffer] += now.tv_nsec - Ti_time[pkgs_in_buffer];
 
             packages.pop();
             entry_times.pop();
 
-            gettimeofday(&now, nullptr);
+            clock_gettime(CLOCK_MONOTONIC, &now);
             // Service has started for the next package
             if ( !packages.empty() ) {
-                service_start = now.tv_usec;
-                total_wait += now.tv_usec - entry_times.front();
+                service_start = now.tv_nsec;
+                total_wait += now.tv_nsec - entry_times.front();
             }
         }
 
         // Lambda time has passed
-        if( (now.tv_usec - last_package.tv_usec) >= ( (1/lambda) * 1000) ) {
-            gettimeofday(&last_package, nullptr);
+        if( (now.tv_nsec - last_package.tv_nsec) >= ( (1/lambda) * 1000) ) {
+            clock_gettime(CLOCK_MONOTONIC, &last_package);
             pkgs_arrived++;
             pkgs_in_buffer = packages.size();
 
@@ -81,45 +81,45 @@ int main(int argc, char** argv) {
 
             if ( number == 1 ) {
                 // A package has entered the buffer
-                gettimeofday(&now, nullptr);
+                clock_gettime(CLOCK_MONOTONIC, &now);
 
-                Ti_time[pkgs_in_buffer+1] = now.tv_usec;
-                Ti[pkgs_in_buffer] += now.tv_usec - Ti_time[pkgs_in_buffer];
+                Ti_time[pkgs_in_buffer+1] = now.tv_nsec;
+                Ti[pkgs_in_buffer] += now.tv_nsec - Ti_time[pkgs_in_buffer];
                 packages.push(pkgs_accepted);
-                entry_times.push(now.tv_usec);
+                entry_times.push(now.tv_nsec);
                 if ( pkgs_in_buffer == 0 ) {
-                    service_start = now.tv_usec;
+                    service_start = now.tv_nsec;
                 }
                 pkgs_accepted++;
             }
         }
 
-        gettimeofday(&end, nullptr);
+        clock_gettime(CLOCK_MONOTONIC, &end);
     }
 
     while ( !packages.empty() ) {
-        gettimeofday(&now, nullptr);
+        clock_gettime(CLOCK_MONOTONIC, &now);
 
         // 1/Mu time has passed since service started
-        if ( !packages.empty() && ( (now.tv_usec - service_start) >= ( (1/mu) * 1000 ) ) ) {
+        if ( !packages.empty() && ( (now.tv_nsec - service_start) >= ( (1/mu) * 1000 ) ) ) {
             pkgs_in_buffer = packages.size();
-            Ti_time[pkgs_in_buffer-1] = now.tv_usec;
-            Ti[pkgs_in_buffer] += now.tv_usec - Ti_time[pkgs_in_buffer];
+            Ti_time[pkgs_in_buffer-1] = now.tv_nsec;
+            Ti[pkgs_in_buffer] += now.tv_nsec - Ti_time[pkgs_in_buffer];
 
             packages.pop();
             entry_times.pop();
 
-            gettimeofday(&now, nullptr);
+            clock_gettime(CLOCK_MONOTONIC, &now);
             // Service has started for the next package
             if ( !packages.empty() ) {
-                service_start = now.tv_usec;
-                total_wait += now.tv_usec - entry_times.front();
+                service_start = now.tv_nsec;
+                total_wait += now.tv_nsec - entry_times.front();
             }
         }
     }
-    gettimeofday(&end, nullptr);
+    clock_gettime(CLOCK_MONOTONIC, &end);
 
-    double T_tag = ((double)(end.tv_usec - start.tv_usec)) / 1000;
+    double T_tag = ((double)(end.tv_nsec - start.tv_nsec)) / 1000;
 
     cout << pkgs_accepted << " ";
     cout << pkgs_arrived - pkgs_accepted << " ";
