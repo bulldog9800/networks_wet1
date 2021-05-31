@@ -49,11 +49,11 @@ int main(int argc, char** argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &start);
     clock_gettime(CLOCK_MONOTONIC, &end);
-    while( (end.tv_nsec - start.tv_nsec) < ( T * 1000 ) ) {
+    while( (end.tv_nsec - start.tv_nsec) < ( T * 1000000 ) ) {
         clock_gettime(CLOCK_MONOTONIC, &now);
 
         // 1/Mu time has passed since service started
-        if ( !packages.empty() && ( (now.tv_nsec - service_start) >= ( (1/mu) * 1000 ) ) ) {
+        if ( !packages.empty() && ( (now.tv_nsec - service_start) >= ( (1/mu) * 1000000 ) ) ) {
             pkgs_in_buffer = packages.size();
             Ti_time[pkgs_in_buffer-1] = now.tv_nsec;
             Ti[pkgs_in_buffer] += now.tv_nsec - Ti_time[pkgs_in_buffer];
@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
         }
 
         // Lambda time has passed
-        if( (now.tv_nsec - last_package.tv_nsec) >= ( (1/lambda) * 1000) ) {
+        if( (now.tv_nsec - last_package.tv_nsec) >= ( (1/lambda) * 1000000) ) {
             clock_gettime(CLOCK_MONOTONIC, &last_package);
             pkgs_arrived++;
             pkgs_in_buffer = packages.size();
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
         clock_gettime(CLOCK_MONOTONIC, &now);
 
         // 1/Mu time has passed since service started
-        if ( !packages.empty() && ( (now.tv_nsec - service_start) >= ( (1/mu) * 1000 ) ) ) {
+        if ( !packages.empty() && ( (now.tv_nsec - service_start) >= ( (1/mu) * 1000000 ) ) ) {
             pkgs_in_buffer = packages.size();
             Ti_time[pkgs_in_buffer-1] = now.tv_nsec;
             Ti[pkgs_in_buffer] += now.tv_nsec - Ti_time[pkgs_in_buffer];
@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
     }
     clock_gettime(CLOCK_MONOTONIC, &end);
 
-    double T_tag = ((double)(end.tv_nsec - start.tv_nsec)) / 1000;
+    double T_tag = ((double)(end.tv_nsec - start.tv_nsec)) / 1000000;
 
     cout << pkgs_accepted << " ";
     cout << pkgs_arrived - pkgs_accepted << " ";
