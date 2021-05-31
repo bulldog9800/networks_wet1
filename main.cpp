@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
     vector<suseconds_t> Zi(probabilities.size(), 0);
     vector<suseconds_t> Ti_time(probabilities.size(), 0);
 
-    struct timespec start, end, last_package, now;
+    struct timespec start, end, last_package, now, difference;
     last_package.tv_nsec = 0;
 
     int pkgs_in_buffer = 0;
@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &start);
     clock_gettime(CLOCK_MONOTONIC, &end);
-    while( (end.tv_nsec - start.tv_nsec) < ( T * 1000000 ) ) {
+    while( difference.tv_nsec < ( T * 1000000 ) ) {
         cout << "start = " << start.tv_nsec << endl;
         cout << "end = " << end.tv_nsec << endl;
         cout << "end - start = " << diff(start, end).tv_nsec << endl;
@@ -110,6 +110,7 @@ int main(int argc, char** argv) {
         }
 
         clock_gettime(CLOCK_MONOTONIC, &end);
+        difference = diff(start, end);
     }
 
     while ( !packages.empty() ) {
