@@ -59,13 +59,13 @@ int main(int argc, char** argv) {
 
     default_random_engine generator;
 
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    clock_gettime(CLOCK_MONOTONIC, &end);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
     while( difference.tv_nsec < ( T * 1000000 ) ) {
         cout << "start = " << start.tv_nsec << endl;
         cout << "end = " << end.tv_nsec << endl;
         cout << "end - start = " << diff(start, end).tv_nsec << endl;
-        clock_gettime(CLOCK_MONOTONIC, &now);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &now);
 
         // 1/Mu time has passed since service started
         if ( !packages.empty() && ( (now.tv_nsec - service_start) >= ( (1/mu) * 1000000 ) ) ) {
@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
             packages.pop();
             entry_times.pop();
 
-            clock_gettime(CLOCK_MONOTONIC, &now);
+            clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &now);
             // Service has started for the next package
             if ( !packages.empty() ) {
                 service_start = now.tv_nsec;
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
 
         // Lambda time has passed
         if( (now.tv_nsec - last_package.tv_nsec) >= ( (1/lambda) * 1000000) ) {
-            clock_gettime(CLOCK_MONOTONIC, &last_package);
+            clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &last_package);
             pkgs_arrived++;
             pkgs_in_buffer = packages.size();
 
@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 
             if ( number == 1 ) {
                 // A package has entered the buffer
-                clock_gettime(CLOCK_MONOTONIC, &now);
+                clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &now);
 
                 Ti_time[pkgs_in_buffer+1] = now.tv_nsec;
                 Ti[pkgs_in_buffer] += now.tv_nsec - Ti_time[pkgs_in_buffer];
@@ -110,12 +110,12 @@ int main(int argc, char** argv) {
         }
 
         end = {0, 0};
-        clock_gettime(CLOCK_MONOTONIC, &end);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
         difference = diff(start, end);
     }
 
     while ( !packages.empty() ) {
-        clock_gettime(CLOCK_MONOTONIC, &now);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &now);
 
         // 1/Mu time has passed since service started
         if ( !packages.empty() && ( (now.tv_nsec - service_start) >= ( (1/mu) * 1000000 ) ) ) {
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
             packages.pop();
             entry_times.pop();
 
-            clock_gettime(CLOCK_MONOTONIC, &now);
+            clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &now);
             // Service has started for the next package
             if ( !packages.empty() ) {
                 service_start = now.tv_nsec;
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
             }
         }
     }
-    clock_gettime(CLOCK_MONOTONIC, &end);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
     double T_tag = ((double)(end.tv_nsec - start.tv_nsec)) / 1000000;
 
