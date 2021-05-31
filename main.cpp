@@ -16,6 +16,18 @@ using std::queue;
 using std::default_random_engine;
 using std::discrete_distribution;
 
+timespec diff(timespec start, timespec end) {
+	timespec temp;
+	if ((end.tv_nsec-start.tv_nsec)<0) {
+		temp.tv_sec = end.tv_sec-start.tv_sec-1;
+		temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+	} else {
+		temp.tv_sec = end.tv_sec-start.tv_sec;
+		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
+	}
+	return temp;
+}
+
 int main(int argc, char** argv) {
     double T = stod(string(argv[1]));
     double lambda = stod(string(argv[2]));
@@ -52,7 +64,7 @@ int main(int argc, char** argv) {
     while( (end.tv_nsec - start.tv_nsec) < ( T * 1000000 ) ) {
         cout << "start = " << start.tv_nsec << endl;
         cout << "end = " << end.tv_nsec << endl;
-        cout << "start - end = " << end.tv_nsec - start.tv_nsec << endl;
+        cout << "end - start = " << diff(start, end).tv_nsec << endl;
         clock_gettime(CLOCK_MONOTONIC, &now);
 
         // 1/Mu time has passed since service started
