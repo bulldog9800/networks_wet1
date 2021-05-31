@@ -50,6 +50,9 @@ int main(int argc, char** argv) {
     clock_gettime(CLOCK_MONOTONIC, &start);
     clock_gettime(CLOCK_MONOTONIC, &end);
     while( (end.tv_nsec - start.tv_nsec) < ( T * 1000000 ) ) {
+        cout << "start = " << start.tv_nsec << endl;
+        cout << "end = " << end.tv_nsec << endl;
+        cout << "start - end = " << end.tv_nsec - start.tv_nsec << endl;
         clock_gettime(CLOCK_MONOTONIC, &now);
 
         // 1/Mu time has passed since service started
