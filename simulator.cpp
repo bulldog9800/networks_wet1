@@ -128,6 +128,10 @@ int main(int argc, char** argv) {
 
     cout << pkgs_accepted << " " << pkgs_arrived - pkgs_accepted << " " <<
     t_tag << endl;
+    for (auto t : Ti) {
+        cout << t << " ";
+    }
+    cout << endl;
 
 
     return 0;
