@@ -51,14 +51,13 @@ int main(int argc, char** argv) {
     int pkgs_in_buffer = 0;
 
     double package_time = 0, total_service = 0, last_service = 0, total_wait = 0;
-    double u, d, s;
-    bool inserted = false;
+    double d, s;
 
     while (package_time <= total_allowed) {
-         u = distr(generator);
+         distr(generator);
 
          while ( package_time <= total_allowed && packages.empty() ) {
-             d = (-1*log(u)) / lambda;
+             d = (-1*log(distr(generator))) / lambda;
              package_time += d;
              pkgs_arrived++;
 
@@ -77,12 +76,11 @@ int main(int argc, char** argv) {
              }
          }
 
-         s = (-1*log(u)) / mu;
+         s = (-1*log(distr(generator))) / mu;
          total_service += s;
 
          while ( package_time < last_service + s ) {
-             u = distr(generator);
-             d = (-1*log(u)) / lambda;
+             d = (-1*log(distr(generator))) / lambda;
              package_time += d;
              pkgs_arrived++;
 
@@ -110,13 +108,11 @@ int main(int argc, char** argv) {
          last_service = t;
 
 
-         /************************/
     }
 
     while ( !packages.empty() ) {
-        u = distr(generator);
 
-        s = (-1*log(u)) / mu;
+        s = (-1*log(distr(generator))) / mu;
         total_service += s;
 
         double t = last_service + s;
