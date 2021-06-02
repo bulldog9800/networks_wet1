@@ -59,6 +59,7 @@ int main(int argc, char** argv) {
          while ( package_time <= total_allowed && packages.empty() ) {
              d = (-1*log(distr(generator))) / lambda;
              package_time += d;
+             cout << "package arrived at: " << package_time << endl;
              pkgs_arrived++;
 
              pkgs_in_buffer = packages.size();
@@ -68,6 +69,13 @@ int main(int argc, char** argv) {
              int number = distribution(generator);
 
              if ( number == 1 ) {
+                 cout << "Queue was empty" << endl;
+                 cout << "package accepted at: " << package_time << endl;
+                 cout << "Ti : ";
+                 for (auto t : Ti) {
+                     cout << t << " ";
+                 }
+                 cout << endl;
                  pkgs_accepted++;
                  Ti_time[pkgs_in_buffer+1] = package_time;
                  Ti[pkgs_in_buffer] += package_time - Ti_time[pkgs_in_buffer];
@@ -79,9 +87,13 @@ int main(int argc, char** argv) {
          s = (-1*log(distr(generator))) / mu;
          total_service += s;
 
+         cout << "\nStarting to process package at time: " << last_service << endl;
+         cout << "Processing should be done after " << s << " time\n" << endl;
+
          while ( package_time < last_service + s ) {
              d = (-1*log(distr(generator))) / lambda;
              package_time += d;
+             cout << "package arrived at: " << package_time << endl;
              pkgs_arrived++;
 
              pkgs_in_buffer = packages.size();
@@ -91,6 +103,11 @@ int main(int argc, char** argv) {
              int number = distribution(generator);
 
              if ( number == 1 ) {
+                 cout << "package accepted at: " << package_time << endl;
+                 cout << "Ti : ";
+                 for (auto t : Ti) {
+                     cout << t << " ";
+                 }
                  pkgs_accepted++;
                  Ti_time[pkgs_in_buffer+1] = package_time;
                  Ti[pkgs_in_buffer] += package_time - Ti_time[pkgs_in_buffer];
@@ -100,18 +117,20 @@ int main(int argc, char** argv) {
 
          // Popping
          double t = last_service + s;
+         cout << "\nFinished processing package at time " << t << endl;
+         cout << "Ti : ";
+         for (auto t : Ti) {
+             cout << t << " ";
+         }
          pkgs_in_buffer = packages.size();
          Ti_time[pkgs_in_buffer-1] = t;
          Ti[pkgs_in_buffer] += t - Ti_time[pkgs_in_buffer];
 
          packages.pop();
          last_service = t;
-
-
     }
 
     while ( !packages.empty() ) {
-
         s = (-1*log(distr(generator))) / mu;
         total_service += s;
 
